@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="633.0" prefWidth="864.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.frame.MainController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="633.0" prefWidth="864.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.frame.MainController">
    <children>
       <FlowPane layoutX="14.0" layoutY="91.0" prefHeight="382.0" prefWidth="835.0">
          <children>
@@ -34,13 +31,27 @@
          </menus>
       </MenuBar>
       <Label layoutX="14.0" layoutY="58.0" text="主机" />
-      <TextField fx:id="hostTxtField" layoutX="52.0" layoutY="54.0" />
+      <TextField fx:id="hostTxtField" layoutX="52.0" layoutY="54.0" text="193.112.44.141" />
       <Label layoutX="323.0" layoutY="58.0" text="用户名" />
-      <TextField fx:id="userTxtField" layoutX="377.0" layoutY="54.0" promptText="不填即匿名登录" />
+      <TextField fx:id="userTxtField" layoutX="377.0" layoutY="54.0" promptText="不填即匿名登录" text="huaqi" />
       <Label layoutX="554.0" layoutY="58.0" text="密码" />
       <Button layoutX="779.0" layoutY="54.0" mnemonicParsing="false" onMouseClicked="#connect" text="快速链接" />
-      <PasswordField fx:id="pwdTxtField" layoutX="594.0" layoutY="55.0" />
+      <PasswordField fx:id="pwdTxtField" layoutX="594.0" layoutY="55.0" text="huaqi" />
       <Label layoutX="224.0" layoutY="58.0" text="端口" />
-      <TextField layoutX="254.0" layoutY="54.0" prefHeight="23.0" prefWidth="48.0" promptText="21" text="21" />
+      <TextField fx:id="portTxtField" layoutX="254.0" layoutY="54.0" prefHeight="23.0" prefWidth="48.0" promptText="21" text="21" />
+      <Button fx:id="refleshLocalBtn" layoutX="14.0" layoutY="483.0" mnemonicParsing="false" onMouseClicked="#refleshLocal" text="刷新" />
+      <Button fx:id="refleshRemoteBtn" layoutX="412.0" layoutY="483.0" mnemonicParsing="false" onMouseClicked="#refleshRemote" text="刷新" />
+      <Button layoutX="70.0" layoutY="483.0" mnemonicParsing="false" onMouseClicked="#upload" text="上传" />
+      <Button layoutX="468.0" layoutY="483.0" mnemonicParsing="false" onMouseClicked="#download" text="下载" />
+      <ScrollPane fx:id="uploadPane" layoutX="14.0" layoutY="519.0" prefHeight="106.0" prefWidth="393.0">
+         <content>
+            <VBox fx:id="uploadBox" prefHeight="103.0" prefWidth="390.0" />
+         </content>
+      </ScrollPane>
+      <ScrollPane fx:id="downloadPane" layoutX="408.0" layoutY="519.0" prefHeight="106.0" prefWidth="442.0">
+         <content>
+            <VBox fx:id="downloadBox" prefHeight="104.0" prefWidth="441.0" />
+         </content>
+      </ScrollPane>
    </children>
 </AnchorPane>

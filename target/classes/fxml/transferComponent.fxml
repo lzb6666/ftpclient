@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Button?>
+
+<fx:root prefHeight="23.0" prefWidth="254.0" spacing="10.0" type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+   <children>
+       <ProgressBar fx:id="progressBar" />
+       <Button fx:id="ctlBtn" onMouseClicked="#ctl" text="暂停" />
+      <Label fx:id="fileNameLable" text="Label" />
+   </children>
+</fx:root>

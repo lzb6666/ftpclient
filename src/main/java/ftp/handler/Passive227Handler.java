@@ -6,6 +6,8 @@ import ftp.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 /**
  * create by zhong
  * ftp.handler
@@ -16,7 +18,13 @@ public class Passive227Handler implements ResponseHandler{
     private static final Logger log=LoggerFactory.getLogger(Passive227Handler.class);
     @Override
     public void process(FTPSiteContext context,String request, String response) {
-        context.setFilePort(getPort(response));
+        try {
+            context.setFilePort(getPort(response));
+        } catch (IOException e) {
+            log.error(response);
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
         System.out.println(response);
     }
 

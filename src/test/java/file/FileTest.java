@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Arrays;
 
 /**
  * create by zhong
@@ -32,4 +34,14 @@ public class FileTest {
         File file=new File("D:\\课程\\网络工程\\ftp\\test");
         System.out.println(file.length());
     }
+
+    @Test
+    public void fileListTest(){
+        File file=new File("D:\\课程\\网络工程");
+        Timestamp timestamp=new Timestamp(file.lastModified());
+        System.out.println(timestamp);
+        Arrays.stream(file.list()).forEach(System.out::println);
+    }
+
+
 }

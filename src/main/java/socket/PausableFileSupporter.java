@@ -1,35 +1,32 @@
 package socket;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 
 /**
  * create by zhong
  * socket
- * Date 2019/5/3
+ * Date 2019/5/17
  */
-public class FileSocket extends Socket implements FileSupporter {
+public class PausableFileSupporter extends AbstractFileSupporter {
+    private Socket socket;
     private OutputStream outputStream;
     private InputStream inputStream;
+
     private boolean append=true;
-    private long offset=0;
     private boolean pause=false;
-    private static final Logger log= LoggerFactory.getLogger(FileSocket.class);
 
-    public FileSocket(InetAddress address, int port) throws IOException {
-        super(address,port);
-        this.outputStream=getOutputStream();
-        this.inputStream=getInputStream();
-    }
 
-    public FileSocket(String host,int port) throws IOException {
-        super(host,port);
-        this.outputStream=getOutputStream();
-        this.inputStream=getInputStream();
+    private static final Logger log= LoggerFactory.getLogger(PausableFileSupporter.class);
+
+    public PausableFileSupporter(String host,int port) throws IOException {
+        socket=new Socket(host, port);
+        outputStream=socket.getOutputStream();
+        inputStream=socket.getInputStream();
     }
 
     @Override
@@ -42,29 +39,36 @@ public class FileSocket extends Socket implements FileSupporter {
             fileOutputStream=new FileOutputStream(localPath);
         }
 
-        byte[] temp=new byte[100];
-        long size=0;
-        while (inputStream.available()!=0){
-            size+=inputStream.read(temp);
-            fileOutputStream.write(temp);
+        byte[] temp=new byte[1024];
+        int readByte=0;
+        //while (inputStream.available()!=0){
+        while (size<totalSize){
+            readByte=inputStream.read(temp);
+            if (readByte==-1)continue;
+            fileOutputStream.write(temp,0,readByte);
             fileOutputStream.flush();
+            size+=readByte;
             if (pause){
                 break;
             }
         }
+        fileOutputStream.close();
         close();
     }
 
     @Override
     public void upload(String localPath) throws IOException {
         FileInputStream fileInputStream=new FileInputStream(localPath);
+        totalSize=new File(localPath).length();
         if (fileInputStream.skip(offset)!=offset){
             log.error(localPath+"skipped "+offset);
         }
-        byte[] temp=new byte[100];
-        while (fileInputStream.read(temp)!=-1){
-            outputStream.write(temp);
+        byte[] temp=new byte[1024];
+        int tempSize=0;
+        while ((tempSize=fileInputStream.read(temp))!=-1){
+            outputStream.write(temp,0,tempSize);
             outputStream.flush();
+            size+=tempSize;
             if (pause){
                 break;
             }
@@ -90,24 +94,17 @@ public class FileSocket extends Socket implements FileSupporter {
         return sb.toString();
     }
 
-    public boolean isAppend() {
-        return append;
-    }
-
-    public void setAppend(boolean append) {
-        this.append = append;
-    }
-
     @Override
     public void pause() {
         this.pause=true;
     }
 
-    public long getOffset() {
-        return offset;
-    }
-
-    public void setOffset(long offset) {
-        this.offset = offset;
+    private void close(){
+        try {
+            socket.close();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

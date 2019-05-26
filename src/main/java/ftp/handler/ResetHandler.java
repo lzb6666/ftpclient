@@ -5,7 +5,8 @@ import ftp.FTPSiteContext;
 import ftp.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import socket.FileSocket;
+import socket.AbstractFileSupporter;
+import socket.FileSupporter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +21,9 @@ public class ResetHandler implements ResponseHandler {
     private static final Logger log= LoggerFactory.getLogger(ResetHandler.class);
     @Override
     public void process(FTPSiteContext context, String request, String response) {
-        context.getFileSupporter().setOffset(getOffset(request));
+        AbstractFileSupporter supporter=(AbstractFileSupporter) context.getFileSupporter();
+        //supporter.setOffset(getOffset(request));
+        supporter.setAppend(true);
     }
 
     private long getOffset(String request){

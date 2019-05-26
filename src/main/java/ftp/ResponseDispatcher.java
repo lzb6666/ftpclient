@@ -4,6 +4,8 @@ import ftp.handler.DefaultResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 /**
  * create by zhong
  * socket
@@ -14,6 +16,12 @@ public class ResponseDispatcher {
     private static final Logger log= LoggerFactory.getLogger(ResponseDispatcher.class);
     private static final ResponseHandler defaultResponseHandler=new DefaultResponseHandler();
     public void dispatcher(FTPSiteContext ftpSiteContext,String request,String response){
+        String r;
+        try {
+            r=ftpSiteContext.getCmdExecutor().exec(request);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (response==null){
             log.error("response=null");
             return;

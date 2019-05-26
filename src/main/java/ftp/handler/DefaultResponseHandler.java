@@ -14,6 +14,7 @@ public class DefaultResponseHandler implements ResponseHandler {
     private static final Logger log= LoggerFactory.getLogger(DefaultResponseHandler.class);
     @Override
     public void process(FTPSiteContext context,String request, String response) {
-        System.out.println(response);
+        //System.out.println(request+" "+response);
+        context.setLastSuccessful(true);
     }
 }

@@ -12,7 +12,4 @@ public interface FileSupporter {
     void download(String localPath)throws IOException;
     void upload(String localPath)throws IOException;
     String getResponse()throws IOException;
-    void setOffset(long offset);
-    void setAppend(boolean append);
-    void pause();
 }

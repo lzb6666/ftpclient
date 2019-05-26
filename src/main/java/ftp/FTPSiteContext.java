@@ -1,5 +1,8 @@
 package ftp;
 
+import ftp.handler.DefaultResponseHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import socket.*;
 
 import java.io.IOException;
@@ -20,42 +23,60 @@ public class FTPSiteContext {
     private FileSupporter fileSupporter;
     private CmdExecutor cmdExecutor;
 
+    private boolean lastSuccessful=true;
+    private boolean allSuccessful=true;
 
-    /*private FTPFileSocket fileSocket;
-    private FTPCmdSocket cmdSocket;*/
+    private ApplicationContext appContext;
+    private static final ResponseHandler defaultResponseHandler=new DefaultResponseHandler();
 
-    public FTPSiteContext(String host, int cmdPort) throws IOException {
+    private static final Logger log= LoggerFactory.getLogger(FTPSiteContext.class);
+
+    public FTPSiteContext(String host, int cmdPort){
         this.host = host;
         this.cmdPort = cmdPort;
-        //this.cmdSocket=new FTPCmdSocket(new Socket(host,cmdPort));
-        this.cmdExecutor= CmdExecutorFactory.getFTPCmdExecutor(host,cmdPort);
+    }
+
+    public void dispatcher(String request) throws IOException {
+        String response=cmdExecutor.exec(request);
+        String code=response.substring(0,3);
+        ResponseHandler handler;
+        if (appContext==null){
+            log.error("app has not inited");
+        }
+        if (appContext.getHandlers().keySet().contains(code)){
+            handler=(ResponseHandler) appContext.getHandlers().get(code);
+        }else {
+            handler=defaultResponseHandler;
+        }
+        //log.debug(request+":"+response);
+        handler.process(this,request,response);
     }
 
     public String getHost() {
         return host;
     }
 
-    public void setHost(String host) {
+    public void setHost(String host) throws IOException {
         this.host = host;
-        this.cmdExecutor= CmdExecutorFactory.getFTPCmdExecutor(host,cmdPort);
+        this.cmdExecutor= null;
     }
 
     public int getCmdPort() {
         return cmdPort;
     }
 
-    public void setCmdPort(short cmdPort) {
+    public void setCmdPort(int cmdPort) throws IOException {
         this.cmdPort = cmdPort;
-        this.cmdExecutor= CmdExecutorFactory.getFTPCmdExecutor(host,cmdPort);
+        this.cmdExecutor= null;
     }
 
     public int getFilePort() {
         return filePort;
     }
 
-    public void setFilePort(short filePort) {
+    public void setFilePort(int filePort) throws IOException {
         this.filePort = filePort;
-        this.fileSupporter= FileSupporterFactory.getFTPFileSupport(host,filePort);
+        this.fileSupporter= SupporterFactory.getPausableSupport(host,filePort);
     }
 
     public FileSupporter getFileSupporter() {
@@ -66,32 +87,16 @@ public class FTPSiteContext {
         this.fileSupporter = fileSupporter;
     }
 
-    public CmdExecutor getCmdExecutor() {
+    public CmdExecutor getCmdExecutor() throws IOException {
+        if (cmdExecutor==null){
+            this.cmdExecutor= ExecutorFactory.getSimpleExector(host, cmdPort);
+        }
         return cmdExecutor;
     }
 
     public void setCmdExecutor(CmdExecutor cmdExecutor) {
         this.cmdExecutor = cmdExecutor;
     }
-
-    /*    public void setFilePort(short filePort) throws IOException {
-        this.filePort = filePort;
-        try {
-            fileSocket=new FTPFileSocket(new Socket(host,filePort));
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    public FTPCmdSocket getCmdSocket() {
-        return cmdSocket;
-    }
-
-    public FTPFileSocket getFileSocket() {
-
-        return fileSocket;
-    }*/
 
     public String getLocalDirectory() {
         return localDirectory;
@@ -109,16 +114,36 @@ public class FTPSiteContext {
         this.remoteDirectory = remoteDirectory;
     }
 
-    public void close(){
-        if (cmdExecutor instanceof Socket){
-            Socket socket=(Socket)cmdExecutor;
-            try {
-                socket.close();
-            } catch (IOException e) {
-                //TODO:log
-                e.printStackTrace();
-            }
-        }
+    public boolean isLastSuccessful() {
+        boolean temp=lastSuccessful;
+        lastSuccessful=true;
+        return temp;
     }
 
+    public void setLastSuccessful(boolean lastSuccessful) {
+        allSuccessful=allSuccessful&lastSuccessful;
+        this.lastSuccessful = lastSuccessful;
+    }
+
+    /**
+     * only return once;
+     * @return 自上次查询allSuccessful起，是否全部操作成功，仅返回一次，返回后将置为true
+     */
+    public boolean isAllSuccessful() {
+        boolean temp=allSuccessful;
+        allSuccessful=true;
+        return temp;
+    }
+
+    public void setAllSuccessful(boolean allSuccessful) {
+        this.allSuccessful = allSuccessful;
+    }
+
+    public ApplicationContext getAppContext() {
+        return appContext;
+    }
+
+    public void setAppContext(ApplicationContext appContext) {
+        this.appContext = appContext;
+    }
 }

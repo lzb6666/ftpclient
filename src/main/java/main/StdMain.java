@@ -22,6 +22,7 @@ public class StdMain {
         //站点上下文
         try {
             FTPSiteContext siteContext=new FTPSiteContext("193.112.44.141", (short) 21);
+            siteContext.setAppContext(context);
             CmdExecutor executor=siteContext.getCmdExecutor();
             Scanner in=new Scanner(System.in);
             String cmd=null;

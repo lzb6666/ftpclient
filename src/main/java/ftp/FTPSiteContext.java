@@ -3,10 +3,12 @@ package ftp;
 import ftp.handler.DefaultResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import socket.*;
+import socket.CmdExecutor;
+import socket.ExecutorFactory;
+import socket.FileSupporter;
+import socket.SupporterFactory;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * create by zhong
@@ -23,33 +25,33 @@ public class FTPSiteContext {
     private FileSupporter fileSupporter;
     private CmdExecutor cmdExecutor;
 
-    private boolean lastSuccessful=true;
-    private boolean allSuccessful=true;
+    private boolean lastSuccessful = true;
+    private boolean allSuccessful = true;
+    private String lastResponse;
 
     private ApplicationContext appContext;
-    private static final ResponseHandler defaultResponseHandler=new DefaultResponseHandler();
+    private static final ResponseHandler defaultResponseHandler = new DefaultResponseHandler();
 
-    private static final Logger log= LoggerFactory.getLogger(FTPSiteContext.class);
+    private static final Logger log = LoggerFactory.getLogger(FTPSiteContext.class);
 
-    public FTPSiteContext(String host, int cmdPort){
+    public FTPSiteContext(String host, int cmdPort) {
         this.host = host;
         this.cmdPort = cmdPort;
     }
 
     public void dispatcher(String request) throws IOException {
-        String response=cmdExecutor.exec(request);
-        String code=response.substring(0,3);
+        String response = cmdExecutor.exec(request);
+        String code = response.substring(0, 3);
         ResponseHandler handler;
-        if (appContext==null){
+        if (appContext == null) {
             log.error("app has not inited");
         }
-        if (appContext.getHandlers().keySet().contains(code)){
-            handler=(ResponseHandler) appContext.getHandlers().get(code);
-        }else {
-            handler=defaultResponseHandler;
+        if (appContext.getHandlers().keySet().contains(code)) {
+            handler = (ResponseHandler) appContext.getHandlers().get(code);
+        } else {
+            handler = defaultResponseHandler;
         }
-        //log.debug(request+":"+response);
-        handler.process(this,request,response);
+        handler.process(this, request, response);
     }
 
     public String getHost() {
@@ -58,7 +60,7 @@ public class FTPSiteContext {
 
     public void setHost(String host) throws IOException {
         this.host = host;
-        this.cmdExecutor= null;
+        this.cmdExecutor = null;
     }
 
     public int getCmdPort() {
@@ -67,7 +69,7 @@ public class FTPSiteContext {
 
     public void setCmdPort(int cmdPort) throws IOException {
         this.cmdPort = cmdPort;
-        this.cmdExecutor= null;
+        this.cmdExecutor = null;
     }
 
     public int getFilePort() {
@@ -76,7 +78,7 @@ public class FTPSiteContext {
 
     public void setFilePort(int filePort) throws IOException {
         this.filePort = filePort;
-        this.fileSupporter= SupporterFactory.getPausableSupport(host,filePort);
+        this.fileSupporter = SupporterFactory.getPausableSupport(host, filePort);
     }
 
     public FileSupporter getFileSupporter() {
@@ -88,8 +90,8 @@ public class FTPSiteContext {
     }
 
     public CmdExecutor getCmdExecutor() throws IOException {
-        if (cmdExecutor==null){
-            this.cmdExecutor= ExecutorFactory.getSimpleExector(host, cmdPort);
+        if (cmdExecutor == null) {
+            this.cmdExecutor = ExecutorFactory.getSimpleExector(host, cmdPort);
         }
         return cmdExecutor;
     }
@@ -115,23 +117,24 @@ public class FTPSiteContext {
     }
 
     public boolean isLastSuccessful() {
-        boolean temp=lastSuccessful;
-        lastSuccessful=true;
+        boolean temp = lastSuccessful;
+        lastSuccessful = true;
         return temp;
     }
 
     public void setLastSuccessful(boolean lastSuccessful) {
-        allSuccessful=allSuccessful&lastSuccessful;
+        allSuccessful = allSuccessful & lastSuccessful;
         this.lastSuccessful = lastSuccessful;
     }
 
     /**
      * only return once;
+     *
      * @return 自上次查询allSuccessful起，是否全部操作成功，仅返回一次，返回后将置为true
      */
     public boolean isAllSuccessful() {
-        boolean temp=allSuccessful;
-        allSuccessful=true;
+        boolean temp = allSuccessful;
+        allSuccessful = true;
         return temp;
     }
 
@@ -145,5 +148,13 @@ public class FTPSiteContext {
 
     public void setAppContext(ApplicationContext appContext) {
         this.appContext = appContext;
+    }
+
+    public String getLastResponse() {
+        return lastResponse;
+    }
+
+    public void setLastResponse(String lastResponse) {
+        this.lastResponse = lastResponse;
     }
 }

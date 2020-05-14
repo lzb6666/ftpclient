@@ -15,19 +15,19 @@ public class FileInfo {
     private long size;
 
     public FileInfo() {
-        this.name="";
-        this.authority="";
-        this.lastModify="";
-        this.size=0;
+        this.name = "";
+        this.authority = "";
+        this.lastModify = "";
+        this.size = 0;
     }
 
 
     public FileInfo(File file) {
-        this.name=file.getName();
-        this.lastModify=new Timestamp(file.lastModified()).toString();
-        this.size=file.length();
+        this.name = file.getName();
+        this.lastModify = new Timestamp(file.lastModified()).toString();
+        this.size = file.length();
         //TODO:file权限转rwx
-        this.authority="rwx";
+        this.authority = "rwx";
     }
 
     public FileInfo(String name, String authority, String lastModify, long size) {
@@ -72,6 +72,6 @@ public class FileInfo {
 
     @Override
     public String toString() {
-        return name+"\t"+authority+"\t"+lastModify+"\t"+size;
+        return name + "\t" + authority + "\t" + lastModify + "\t" + size;
     }
 }

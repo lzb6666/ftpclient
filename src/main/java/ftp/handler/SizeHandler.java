@@ -15,11 +15,11 @@ import socket.AbstractFileSupporter;
 public class SizeHandler implements ResponseHandler {
     @Override
     public void process(FTPSiteContext context, String request, String response) {
-        AbstractFileSupporter supporter= (AbstractFileSupporter)context.getFileSupporter();
+        AbstractFileSupporter supporter = (AbstractFileSupporter) context.getFileSupporter();
         supporter.setTotalSize(getSize(response));
     }
 
-    private long getSize(String response){
-        return Long.parseLong(response.substring(4,response.length()));
+    private long getSize(String response) {
+        return Long.parseLong(response.substring(4, response.length()));
     }
 }

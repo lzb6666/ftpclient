@@ -14,8 +14,8 @@ import ftp.ResponseHandler;
 public class ChangeWorkDirHandler implements ResponseHandler {
     @Override
     public void process(FTPSiteContext context, String request, String response) {
-        request=request.substring(3,request.length());
-        String pwd=request.replaceAll(" ","");
+        request = request.substring(3, request.length());
+        String pwd = request.replaceAll(" ", "");
         context.setRemoteDirectory(pwd);
     }
 }

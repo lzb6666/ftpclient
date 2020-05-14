@@ -14,6 +14,6 @@ import ftp.ResponseHandler;
 public class CompleteHandler implements ResponseHandler {
     @Override
     public void process(FTPSiteContext context, String request, String response) {
-
+        //暂时不需要做任何事
     }
 }

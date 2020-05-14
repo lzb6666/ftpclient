@@ -20,13 +20,12 @@ public class ListUtil {
     public static int DATE_LENGTH = 4;
     public static int TIME_LENGTH = 8;
 
-    public static List<FileInfo> getFileInfo(String str)
-    {
+    public static List<FileInfo> getFileInfo(String str) {
         String[] a = str.split("\r\n");
 
         List<FileInfo> file_list = new ArrayList<>();
-        for(String s : a)
-        {
+        for (String s : a) {
+            if (s.equals("")) continue;
             int space_flag = 0;
             char[] chars = s.toCharArray();
 
@@ -41,44 +40,43 @@ public class ListUtil {
             char[] time = new char[TIME_LENGTH];
 
             int start = 0;
-            for(int i = AUTHORIRY_LENGTH; i < chars.length; i++)
-            {
-                if((int)chars[i] == 32)
+            for (int i = AUTHORIRY_LENGTH; i < chars.length; i++) {
+                if ((int) chars[i] == 32)
                     continue;
-                if((int)chars[i - 1] == 32)
+                if ((int) chars[i - 1] == 32)
                     space_flag++;
 
                 //标记一个单元（大小或日期或名称）的起始点
 
 
                 //解析大小
-                if(space_flag == 4 && (int)chars[i - 1] == 32)
+                if (space_flag == 4 && (int) chars[i - 1] == 32)
                     start = i;
-                if(space_flag == 4 && (int)chars[i + 1] == 32)
+                if (space_flag == 4 && (int) chars[i + 1] == 32)
                     System.arraycopy(chars, start, size, 0, i - start + 1);
 
                 //解析月份
-                if(space_flag == 5 && (int)chars[i - 1] == 32)
+                if (space_flag == 5 && (int) chars[i - 1] == 32)
                     start = i;
-                if(space_flag == 5 && (int)chars[i + 1] == 32)
+                if (space_flag == 5 && (int) chars[i + 1] == 32)
                     System.arraycopy(chars, start, month, 0, i - start + 1);
 
                 //解析日期
-                if(space_flag == 6 && (int)chars[i - 1] == 32)
+                if (space_flag == 6 && (int) chars[i - 1] == 32)
                     start = i;
-                if(space_flag == 6 && (int)chars[i + 1] == 32)
+                if (space_flag == 6 && (int) chars[i + 1] == 32)
                     System.arraycopy(chars, start, date, 0, i - start + 1);
 
                 //解析具体时间
-                if(space_flag == 7 && (int)chars[i - 1] == 32)
+                if (space_flag == 7 && (int) chars[i - 1] == 32)
                     start = i;
-                if(space_flag == 7 && (int)chars[i + 1] == 32)
+                if (space_flag == 7 && (int) chars[i + 1] == 32)
                     System.arraycopy(chars, start, time, 0, i - start + 1);
 
                 //解析名称
-                if(space_flag == 8 && (int)chars[i - 1] == 32)
+                if (space_flag == 8 && (int) chars[i - 1] == 32)
                     start = i;
-                if(space_flag == 8 && i == chars.length - 1)
+                if (space_flag == 8 && i == chars.length - 1)
                     System.arraycopy(chars, start, name, 0, i - start + 1);
             }
 
@@ -90,12 +88,10 @@ public class ListUtil {
         return file_list;
     }
 
-    public static String deleteSpace(char[] chars)
-    {
+    public static String deleteSpace(char[] chars) {
         int len = 0;
-        for(int j = 0; j < chars.length; j++)
-        {
-            if(chars[j] != '\0')
+        for (int j = 0; j < chars.length; j++) {
+            if (chars[j] != '\0')
                 len++;
         }
 

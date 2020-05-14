@@ -6,5 +6,5 @@ package ftp;
  * Date 2019/4/25
  */
 public interface ResponseHandler {
-    void process(FTPSiteContext context,String request,String response);
+    void process(FTPSiteContext context, String request, String response);
 }

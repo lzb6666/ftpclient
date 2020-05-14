@@ -1,9 +1,9 @@
 package ftp.handler;
 
 import ftp.FTPSiteContext;
+import ftp.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ftp.ResponseHandler;
 
 /**
  * create by zhong
@@ -11,10 +11,10 @@ import ftp.ResponseHandler;
  * Date 2019/4/27
  */
 public class DefaultResponseHandler implements ResponseHandler {
-    private static final Logger log= LoggerFactory.getLogger(DefaultResponseHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultResponseHandler.class);
+
     @Override
-    public void process(FTPSiteContext context,String request, String response) {
-        //System.out.println(request+" "+response);
+    public void process(FTPSiteContext context, String request, String response) {
         context.setLastSuccessful(true);
     }
 }

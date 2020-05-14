@@ -1,9 +1,6 @@
 package gui.vo;
 
-import ftp.FTPSiteContext;
 import socket.AbstractFileSupporter;
-
-import java.io.IOException;
 
 /**
  * create by zhong
@@ -40,19 +37,19 @@ public class TransferTask {
         this.fileSupporter = fileSupporter;
     }
 
-    public void pause(){
+    public void pause() {
         fileSupporter.pause();
     }
 
     public long getCurSize() {
-        return curSize=fileSupporter.getSize();
+        return curSize = fileSupporter.getSize();
     }
 
     public void setCurSize(long curSize) {
         this.curSize = curSize;
     }
 
-    public void continueTask(){
+    public void continueTask() {
 
     }
 
@@ -80,8 +77,8 @@ public class TransferTask {
         this.abPath = abPath;
     }
 
-    public String getFileName(){
-        String[] files=abPath.split("/");
-        return files[files.length-1];
+    public String getFileName() {
+        String[] files = abPath.split("/");
+        return files[files.length - 1];
     }
 }

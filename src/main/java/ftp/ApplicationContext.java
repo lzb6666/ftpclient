@@ -19,25 +19,25 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date 2019/4/27
  */
 public class ApplicationContext {
-    private Map handlers=new ConcurrentHashMap<String, ResponseHandler>();
+    private Map handlers = new ConcurrentHashMap<String, ResponseHandler>();
 
     public ApplicationContext(String handlerPackage) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if (handlerPackage==null){
+        if (handlerPackage == null) {
             throw new NullPointerException();
         }
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-        Resource[] resources = resourcePatternResolver.getResources("classpath*:"+handlerPackage+"\\*");
-        MetadataReaderFactory metadata=new SimpleMetadataReaderFactory();
-        for(Resource resource:resources) {
-            MetadataReader metadataReader=metadata.getMetadataReader(resource);
+        Resource[] resources = resourcePatternResolver.getResources("classpath*:" + handlerPackage + "\\*");
+        MetadataReaderFactory metadata = new SimpleMetadataReaderFactory();
+        for (Resource resource : resources) {
+            MetadataReader metadataReader = metadata.getMetadataReader(resource);
             ScannedGenericBeanDefinition beanDefinition = new ScannedGenericBeanDefinition(metadataReader);
             beanDefinition.setResource(resource);
             beanDefinition.setSource(resource);
-            String className=beanDefinition.getBeanClassName();
-            Class c=Class.forName(className);
-            FTPResponseHandler handler=Class.forName(className).getDeclaredAnnotation(FTPResponseHandler.class);
-            if (handler!=null){
-                register(handler.status(),(ResponseHandler)c.newInstance());
+            String className = beanDefinition.getBeanClassName();
+            Class c = Class.forName(className);
+            FTPResponseHandler handler = Class.forName(className).getDeclaredAnnotation(FTPResponseHandler.class);
+            if (handler != null) {
+                register(handler.status(), (ResponseHandler) c.newInstance());
             }
         }
     }
@@ -50,7 +50,7 @@ public class ApplicationContext {
         this.handlers = handlers;
     }
 
-    public void register(String status,ResponseHandler handler){
-        handlers.put(status,handler);
+    public void register(String status, ResponseHandler handler) {
+        handlers.put(status, handler);
     }
 }

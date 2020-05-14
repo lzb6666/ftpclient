@@ -1,6 +1,5 @@
 package gui.uicomponent;
 
-import ftp.FTPSiteContext;
 import gui.action.FtpAction;
 import gui.action.LocalAction;
 import gui.vo.TransferTask;
@@ -22,7 +21,7 @@ import java.io.IOException;
  * Date 2019/5/25
  * logTips:private static final Logger log=LoggerFactory.getLogger(${Class}.class)
  */
-public class TransferComponent extends HBox{
+public class TransferComponent extends HBox {
     @FXML
     private ProgressBar progressBar;
     @FXML
@@ -46,48 +45,48 @@ public class TransferComponent extends HBox{
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-        HBox box=fxmlLoader.getRoot();
+        HBox box = fxmlLoader.getRoot();
         /*progressBar= (ProgressBar) box.getChildren().get(0);
         ctlBtn= (Button) box.getChildren().get(1);*/
         this.transferTask = transferTask;
-        progressBar.setProgress(((double)transferTask.getCurSize())/transferTask.getTotalSize());
-        task=new MyTask();
+        progressBar.setProgress(((double) transferTask.getCurSize()) / transferTask.getTotalSize());
+        task = new MyTask();
         progressBar.progressProperty().bind(task.progressProperty());
         new Thread(task).start();
         fileNameLable.setText(transferTask.getAbPath());
     }
 
     @FXML
-    private void ctl(MouseEvent actionEvent){
-        if (ctlBtn.getText().equals("暂停")){
+    private void ctl(MouseEvent actionEvent) {
+        if (ctlBtn.getText().equals("暂停")) {
             action.pause();
             task.cancel();
             ctlBtn.setText("继续");
-        }else if (ctlBtn.getText().equals("继续")){
+        } else if (ctlBtn.getText().equals("继续")) {
             action.continueTask(transferTask);
             progressBar.progressProperty().unbind();
-            task=new MyTask();
+            task = new MyTask();
             progressBar.progressProperty().bind(task.progressProperty());
             new Thread(task).start();
             ctlBtn.setText("暂停");
         }
     }
 
-     class MyTask extends Task{
+    class MyTask extends Task {
 
-        MyTask(){
-            updateProgress(transferTask.getCurSize(),transferTask.getTotalSize());
+        MyTask() {
+            updateProgress(transferTask.getCurSize(), transferTask.getTotalSize());
         }
 
         @Override
         protected Object call() throws Exception {
-            while (transferTask.getCurSize()!=transferTask.getTotalSize()){
-                System.out.println(transferTask.getCurSize()+" "+transferTask.getTotalSize());
-                updateProgress(transferTask.getCurSize(),transferTask.getTotalSize());
+            while (transferTask.getCurSize() != transferTask.getTotalSize()) {
+                System.out.println(transferTask.getCurSize() + " " + transferTask.getTotalSize());
+                updateProgress(transferTask.getCurSize(), transferTask.getTotalSize());
                 Thread.sleep(1000);
             }
-            updateProgress(transferTask.getCurSize(),transferTask.getTotalSize());
-            Platform.runLater(()->{
+            updateProgress(transferTask.getCurSize(), transferTask.getTotalSize());
+            Platform.runLater(() -> {
                 ctlBtn.setText("已完成");
             });
             return true;

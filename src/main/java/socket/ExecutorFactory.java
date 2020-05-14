@@ -11,10 +11,10 @@ import java.io.IOException;
  * Date 2019/5/17
  */
 public class ExecutorFactory {
-    private static final Logger log= LoggerFactory.getLogger(ExecutorFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(ExecutorFactory.class);
 
 
-    public static CmdExecutor getSimpleExector(String host,int port) throws IOException {
-        return new SimpleCmdExecutor(host,port);
+    public static CmdExecutor getSimpleExector(String host, int port) throws IOException {
+        return new SimpleCmdExecutor(host, port);
     }
 }

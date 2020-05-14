@@ -1,8 +1,6 @@
 package socket;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * create by zhong
@@ -10,11 +8,12 @@ import java.io.OutputStream;
  * Date 2019/5/17
  */
 public abstract class AbstractFileSupporter implements FileSupporter {
-    protected boolean append=true;
-    protected long offset=0;
-    protected long size=0;
+    protected boolean append = true;
+    protected long offset = 0;
+    protected long size = 0;
 
-    protected long totalSize=0;
+    protected long totalSize = 0;
+
     @Override
     public abstract void download(String localPath) throws IOException;
 
@@ -39,7 +38,7 @@ public abstract class AbstractFileSupporter implements FileSupporter {
     }
 
     public void setOffset(long offset) {
-        this.size=offset;
+        this.size = offset;
         this.offset = offset;
     }
 

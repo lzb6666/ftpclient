@@ -1,25 +1,25 @@
 package gui.frame;
 
 import ftp.FTPSiteContext;
-import gui.Main;
+import gui.action.FtpAction;
+import gui.action.LocalAction;
 import gui.action.impl.FtpActionImpl;
 import gui.action.impl.LocalActionImpl;
 import gui.uicomponent.TransferComponent;
 import gui.vo.FileInfo;
-import gui.action.FtpAction;
-import gui.action.LocalAction;
 import gui.vo.TransferTask;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -46,43 +46,44 @@ public class MainController {
 
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
-    public void init(){
-        action=new FtpActionImpl();
-        localAction=new LocalActionImpl();
-        context=action.getContext();
-        context.setLocalDirectory("D:\\课程\\网络工程\\ftp");
+    public void init() {
+        action = new FtpActionImpl();
+        localAction = new LocalActionImpl();
+        context = action.getContext();
+        context.setLocalDirectory("D:\\local");
         refleshLocal(null);
         //TODO:init
 
-        remoteDirectory.setOnMouseClicked(value->{
-            if(value.getClickCount()!=2){
-               return;
-            }
-            FileInfo fileInfo=(FileInfo)remoteDirectory.getSelectionModel().getSelectedItem();
-            if (!fileInfo.getAuthority().startsWith("d")){
+        remoteDirectory.setOnMouseClicked(value -> {
+            if (value.getClickCount() != 2) {
                 return;
             }
-            action.changeWorkDir(context.getRemoteDirectory()+"/"+fileInfo.getName());
+            FileInfo fileInfo = (FileInfo) remoteDirectory.getSelectionModel().getSelectedItem();
+            if (!fileInfo.getAuthority().startsWith("d")) {
+                return;
+            }
+            action.changeWorkDir(context.getRemoteDirectory() + "/" + fileInfo.getName());
             refleshRemote(null);
         });
     }
 
     public void connect(MouseEvent mouseEvent) {
-        String host=hostTxtField.getText();
-        int port=Integer.valueOf(portTxtField.getText());
-        String user=userTxtField.getText();
-        boolean login=false;
-        if (user==null||user.equals("")){
-            login=action.anonymityLogin(host,port);
+        String host = hostTxtField.getText();
+        int port = Integer.parseInt(portTxtField.getText());
+        String user = userTxtField.getText();
+        boolean login = false;
+        String pwd = "";
+        if (user == null || user.equals("")) {
+            login = action.anonymityLogin(host, port);
+        } else {
+            pwd = pwdTxtField.getText();
+            login = action.login(host, port, user, pwd);
         }
-        String pwd=pwdTxtField.getText();
-        login=action.login(host,port,user,pwd);
-        Alert alert=new Alert(Alert.AlertType.INFORMATION);
-        if (!login){
-            //TODO:登录失败处理
-            log.error(host+""+port+""+user+""+pwd);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        if (!login) {
+            log.error(host + "" + port + "" + user + "" + pwd);
             alert.setContentText("登陆失败");
-        }else {
+        } else {
             alert.setContentText("登陆成功");
         }
         alert.showAndWait();
@@ -91,12 +92,13 @@ public class MainController {
 
 
     public void refleshLocal(MouseEvent actionEvent) {
-        List<FileInfo> fileInfoList=localAction.list(context.getLocalDirectory());
+        List<FileInfo> fileInfoList = localAction.list(context.getLocalDirectory());
         localDirectory.setItems(FXCollections.observableArrayList(fileInfoList));
     }
 
     public void refleshRemote(MouseEvent actionEvent) {
-        List<FileInfo> fileInfoList=action.list();
+        List<FileInfo> fileInfoList = action.list();
+        if (fileInfoList == null) return;
         remoteDirectory.setItems(FXCollections.observableArrayList(fileInfoList));
     }
 
@@ -125,12 +127,18 @@ public class MainController {
     }
 
     public void upload(MouseEvent mouseEvent) {
-        ObservableList files=localDirectory.getSelectionModel().getSelectedItems();
-        for (Object o:files
-                ) {
-            FileInfo fileInfo = (FileInfo)o;
-            TransferTask task=action.upload(fileInfo.getName());
-            TransferComponent component=new TransferComponent(task);
+        if (!loginCheck()) return;
+        ObservableList files = localDirectory.getSelectionModel().getSelectedItems();
+        for (Object o : files
+        ) {
+            FileInfo fileInfo = (FileInfo) o;
+            TransferTask task = action.upload(fileInfo.getName());
+            if (task == null) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("上传失败：" + action.getContext().getLastResponse());
+                alert.showAndWait();
+            }
+            TransferComponent component = new TransferComponent(task);
             component.setAction(action);
             component.setLocalAction(localAction);
             uploadBox.getChildren().add(component);
@@ -138,15 +146,34 @@ public class MainController {
     }
 
     public void download(MouseEvent mouseEvent) {
-        ObservableList files=remoteDirectory.getSelectionModel().getSelectedItems();
-        for (Object o:files
-             ) {
-            FileInfo fileInfo = (FileInfo)o;
-            TransferTask task=action.download(context.getRemoteDirectory()+"/"+fileInfo.getName());
-            TransferComponent component=new TransferComponent(task);
+        if (!loginCheck()) return;
+        ObservableList files = remoteDirectory.getSelectionModel().getSelectedItems();
+        for (Object o : files
+        ) {
+            FileInfo fileInfo = (FileInfo) o;
+            TransferTask task = action.download(context.getRemoteDirectory() + "/" + fileInfo.getName());
+            TransferComponent component = new TransferComponent(task);
             component.setAction(action);
             component.setLocalAction(localAction);
             downloadBox.getChildren().add(component);
         }
+    }
+
+    public void chooseLocalDir(ActionEvent mouseEvent) {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File file = directoryChooser.showDialog(new Stage());
+        context.setLocalDirectory(file.getAbsolutePath());
+        log.info("改变本地目录为：" + file.getAbsolutePath());
+        refleshLocal(null);
+    }
+
+    private boolean loginCheck() {
+        if (context == null) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("请先登录");
+            alert.showAndWait();
+            return false;
+        }
+        return true;
     }
 }

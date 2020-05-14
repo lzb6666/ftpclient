@@ -13,9 +13,9 @@ import java.util.List;
  */
 public interface FtpAction {
 
-    boolean anonymityLogin(String host,int port);
+    boolean anonymityLogin(String host, int port);
 
-    boolean login(String host,int port,String user,String pwd);
+    boolean login(String host, int port, String user, String pwd);
 
     List<FileInfo> list();
 
